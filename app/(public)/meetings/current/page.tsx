@@ -1,8 +1,8 @@
-import { redirect } from 'next/navigation';
+import MeetingDetail from '@/components/MeetingDetail';
 
 import { getMeetings } from '@/lib/meetings-db';
 
-export default function CurrentMeetingPage() {
+export default async function CurrentMeetingPage() {
   const today = new Date();
   const dayOfWeek = today.getDay();
 
@@ -14,12 +14,17 @@ export default function CurrentMeetingPage() {
   const day = String(sunday.getDate()).padStart(2, '0');
 
   const sundayDate = `${year}-${month}-${day}`;
-  
-  const meeting = getMeetings(sundayDate)[0];
+
+  const meetings = await getMeetings('', 1, sundayDate);
+  const meeting = meetings[0];
 
   if (!meeting) {
-    redirect('/meetings');
+    return (
+      <p className="text-gray-600">
+        No meeting found for the current Sunday.
+      </p>
+    );
   }
 
-  redirect(`/meetings/${meeting.id}`);
+  return <MeetingDetail meeting={meeting} />;
 }
